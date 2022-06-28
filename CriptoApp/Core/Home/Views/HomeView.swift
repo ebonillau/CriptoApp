@@ -12,6 +12,7 @@ struct HomeView: View {
     @EnvironmentObject private var viewModel: HomeViewModel
     @State private var showPortofolio: Bool = false
     @State private var showPortofolioView: Bool = false
+    @State private var showSettingsView: Bool = false
     
     var body: some View {
         ZStack {
@@ -20,14 +21,27 @@ struct HomeView: View {
                     PortofolioView(showPortofolioView: $showPortofolioView)
                         .environmentObject(viewModel)
                 }
+                .sheet(isPresented: $showSettingsView) {
+                    SettingsView(showSettingsView: $showSettingsView)
+                }
             VStack {
                 HomeHeader
                 HomeStatisticsView(showPortofolio: $showPortofolio)
                 SearchBarView(searchText: $viewModel.searchText)
                 ColumnsTitle
                 if showPortofolio {
-                    PortofolioCoinsList
-                        .transition(.move(edge: .leading))
+                    ZStack {
+                        if viewModel.portofoliosCoins.isEmpty && viewModel.searchText.isEmpty {
+                            VStack {
+                                Text("You haven't added coins to your portofolio yet. Click the + button to get started!")
+                                    .font(.headline)
+                                    .padding(50)
+                            }
+                        } else {
+                            PortofolioCoinsList
+                        }
+                    }
+                    .transition(.move(edge: .leading))
                 } else {
                     AllCoinsList
                         .transition(.move(edge: .trailing))
@@ -63,6 +77,8 @@ extension HomeView {
                 .onTapGesture {
                     if showPortofolio {
                         showPortofolioView.toggle()
+                    } else {
+                        showSettingsView.toggle()
                     }
                 }
             Spacer()

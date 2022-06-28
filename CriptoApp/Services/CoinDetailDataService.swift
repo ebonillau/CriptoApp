@@ -24,6 +24,7 @@ class CoinDetailDataService {
         
         subscription = NetworkManager.download(url: url)
             .decode(type: CoinDetail.self, decoder: JSONDecoder())
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: NetworkManager.handleCompletion,
                   receiveValue: { [weak self] coinDetail in
                 self?.coinDetail = coinDetail
